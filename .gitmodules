@@ -1,0 +1,3 @@
+[submodule "noone-android-core-crypto"]
+	path = noone-android-core-crypto
+	url = https://github.com/noonewallet/noone-android-core-crypto.git
