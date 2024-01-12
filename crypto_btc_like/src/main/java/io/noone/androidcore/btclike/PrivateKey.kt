@@ -1,9 +1,10 @@
 package io.noone.androidcore.btclike
 
-import io.noone.androidcore.ECKey
+import  io.noone.androidcore.ECKey
 import io.noone.androidcore.btclike.networks.NetworkParameters
 import io.noone.androidcore.exceptions.AddressFormatException
 import io.noone.androidcore.utils.Base58
+import io.noone.androidcore.utils.sha256sha256
 import java.io.Serializable
 
 class PrivateKey : Serializable, Cloneable {
@@ -25,6 +26,43 @@ class PrivateKey : Serializable, Cloneable {
                 bytes[32] = 1
                 bytes
             }
+        }
+
+        fun fromWif(
+            wif: String,
+            params: NetworkParameters
+        ): PrivateKey {
+            val prefix = params.dumpedPrivateKeyHeader.toByte()
+            val decoded: ByteArray = Base58.decode(wif)
+            require(decoded[0] == prefix) {
+                "Decoded WIF must start with 0x" + prefix.toString(16) + " byte"
+            }
+            val payload: ByteArray = decoded.copyOfRange(0, decoded.size - 4)
+            val checksum: ByteArray = decoded.copyOfRange(decoded.size - 4, decoded.size)
+            val actualChecksum = payload.sha256sha256
+
+            for (i in 0..3) {
+                require(actualChecksum[i] == checksum[i]) { "Wrong checksum" }
+            }
+
+            var compressed = false
+            val pkBytes: ByteArray
+            when (payload.size) {
+                33 -> {
+                    pkBytes = payload.copyOfRange(1, payload.size)
+                }
+
+                34 -> {
+                    require(payload[payload.size - 1] == 0x01.toByte()) { "The last byte of decoded compressed WIF is expected to be 0x01" }
+                    compressed = true
+                    pkBytes = payload.copyOfRange(1, payload.size - 1)
+                }
+
+                else -> {
+                    throw IllegalArgumentException("Incorrect WIF length: " + payload.size)
+                }
+            }
+            return PrivateKey(ECKey.fromPrivate(pkBytes, compressed), params)
         }
 
     }
