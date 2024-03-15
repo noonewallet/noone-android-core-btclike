@@ -1,12 +1,12 @@
 package io.noone.androidcore.btclike.transaction
 
-import io.noone.androidcore.types.UInt
-import io.noone.androidcore.types.VarInt
-import io.noone.androidcore.utils.hex
 import io.noone.androidcore.btclike.ErrorMessages
 import io.noone.androidcore.btclike.PrivateKey
 import io.noone.androidcore.btclike.networks.NetworkParameters
-import java.util.*
+import io.noone.androidcore.types.UInt
+import io.noone.androidcore.types.VarInt
+import io.noone.androidcore.utils.hex
+import java.util.LinkedList
 
 class TransactionBuilder(
     private val witnessProducer: WitnessProducer,
@@ -181,7 +181,6 @@ class TransactionBuilder(
             version,
             LOCK_TIME,
             inputs,
-            outputs,
             signedInputIndex,
             buildOutputs
         )

@@ -19,7 +19,6 @@ class BchSigPreimageProducer : SigPreimageProducer() {
         version: UInt,
         lockTime: UInt,
         inputs: List<Input>,
-        outputs: List<Output>,
         signedInputIndex: Int,
         buildOutputs: List<Output>
     ): ByteArray {
